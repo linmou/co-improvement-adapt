@@ -1,0 +1,75 @@
+{
+  "feature_name": "co_improvement_adapt_skill_materialization",
+  "phase": "red",
+  "iteration": 1,
+  "reviewer_id": "audit3",
+  "claim": "The red phase adds only the next failing test, and the failure is caused by missing behavior rather than syntax, environment, or unrelated breakage.",
+  "overall_verdict": "pass",
+  "overall_confidence": 0.78,
+  "criteria": [
+    {
+      "id": "c1",
+      "text": "Red changed only test-scope files.",
+      "blocking": true,
+      "verdict": "pass",
+      "confidence": 0.72,
+      "evidence": [
+        "The only file under the workspace with a modification time after 2026-07-01 11:50:00 is ./tests/test_skill_materialization_semantics.py.",
+        "The workspace is not a git repository, so git status/git diff could not independently verify red-phase file scope."
+      ],
+      "reasoning": "Available filesystem evidence supports that the red-phase change is test-scoped. Confidence is limited because there is no VCS baseline.",
+      "counterevidence": []
+    },
+    {
+      "id": "c2",
+      "text": "The test specifies the smallest useful behavior for the two high issues: local-skill materialization and installed-directory script resolution.",
+      "blocking": true,
+      "verdict": "pass",
+      "confidence": 0.84,
+      "evidence": [
+        "tests/test_skill_materialization_semantics.py contains two unittest tests.",
+        "The tests target a local skill materialization gate and installed-skill-directory script resolution."
+      ],
+      "reasoning": "The tests target the two stated high issues directly.",
+      "counterevidence": []
+    },
+    {
+      "id": "c3",
+      "text": "The failure is caused by missing behavior in SKILL.md/local-skill-output.md, not syntax, missing environment, or unrelated breakage.",
+      "blocking": true,
+      "verdict": "pass",
+      "confidence": 0.95,
+      "evidence": [
+        "Running python tests/test_skill_materialization_semantics.py completed test discovery and execution.",
+        "The command ran 2 tests and produced 2 assertion failures.",
+        "There was no syntax error, import error, missing Python dependency, or unrelated runtime failure."
+      ],
+      "reasoning": "The red failure is clean: the unittest file executes and fails only because the production/spec Markdown does not yet describe the required behavior.",
+      "counterevidence": []
+    },
+    {
+      "id": "c4",
+      "text": "No production/spec files were changed during red.",
+      "blocking": true,
+      "verdict": "pass",
+      "confidence": 0.76,
+      "evidence": [
+        "SKILL.md modification time is Jun 27 10:51:51 2026.",
+        "references/local-skill-output.md modification time is Jun 27 10:51:51 2026.",
+        "tests/test_skill_materialization_semantics.py modification time is Jul 1 12:03:05 2026."
+      ],
+      "reasoning": "The production/spec Markdown files appear unchanged during the red phase and still lack the required behavior.",
+      "counterevidence": []
+    }
+  ],
+  "open_questions": [
+    "This workspace is not a git repository, so definitive changed-file audit would require an external diff, patch, or VCS root."
+  ],
+  "disputed_points_if_any": [
+    {
+      "point": "VCS verification unavailable",
+      "impact": "Limits confidence for c1 and c4, but does not undermine the observed red failure cause.",
+      "resolution": "Accepted as pass with reduced confidence because current filesystem evidence supports test-only red changes."
+    }
+  ]
+}

@@ -1,0 +1,112 @@
+{
+  "feature_name": "review_skill_semantics",
+  "phase": "semantic",
+  "iteration": 1,
+  "reviewer_id": "audit3",
+  "claim": "The review-with-multi-debate SKILL.md is semantically sound as a reusable skill specification: it has clear trigger boundaries, decomposes reviews into checkable criteria, defines an executable multi-review workflow, has coherent convergence and re-audit semantics, and gives enough output guidance to avoid ambiguous final status.",
+  "overall_verdict": "pass",
+  "overall_confidence": 0.84,
+  "criteria": [
+    {
+      "id": "c1",
+      "text": "Trigger conditions clearly define when to use and not use the skill, without obvious overlap that would cause misuse.",
+      "blocking": true,
+      "verdict": "pass",
+      "confidence": 0.82,
+      "evidence": [
+        "/Users/admin/.codex/skills/review-with-multi-debate/SKILL.md:10 states the skill is for structured multi-review audits, not theatrical debate.",
+        "/Users/admin/.codex/skills/review-with-multi-debate/SKILL.md:14-20 lists affirmative triggers: multiple reviewers, audit files, iterative debate, convergence rules.",
+        "/Users/admin/.codex/skills/review-with-multi-debate/SKILL.md:21-25 excludes summaries, one-pass reviews, and open-ended brainstorming without a concrete artifact and claim."
+      ],
+      "reasoning": "The trigger boundary is semantically usable because it requires an artifact-plus-claim audit context and explicitly excludes common adjacent tasks. The broad phrase 'convergence rules for claim checking, requirement audits, or evidence-based review' could catch many review-like requests, but the surrounding requirement for multi-review disagreement handling narrows it enough to avoid obvious misuse.",
+      "counterevidence": [
+        "/Users/admin/.codex/skills/review-with-multi-debate/SKILL.md:19 is broad and could overlap with ordinary evidence-based review if read without lines 21-25."
+      ]
+    },
+    {
+      "id": "c2",
+      "text": "Input normalization and criterion decomposition are operationally clear enough for an agent to produce 3-7 stable, checkable criteria before reviewer launch.",
+      "blocking": true,
+      "verdict": "pass",
+      "confidence": 0.86,
+      "evidence": [
+        "/Users/admin/.codex/skills/review-with-multi-debate/SKILL.md:35-50 defines required inputs, optional phase default, 3 to 7 criteria, pass/fail/insufficient_evidence verdictability, blocking identification, and feature_name derivation.",
+        "/Users/admin/.codex/skills/review-with-multi-debate/SKILL.md:29-31 requires converting the claim into checkable criteria and stopping to rewrite the claim if clear criteria cannot be produced."
+      ],
+      "reasoning": "The specification gives an actionable pre-review normalization gate: collect named inputs, produce a bounded number of criteria, require verdictability, mark blocking status, and stop if decomposition fails. That is enough for stable reviewer launch.",
+      "counterevidence": []
+    },
+    {
+      "id": "c3",
+      "text": "Round-1 reviewer workflow is executable and preserves reviewer separation with structured evidence-bound JSON output.",
+      "blocking": true,
+      "verdict": "pass",
+      "confidence": 0.88,
+      "evidence": [
+        "/Users/admin/.codex/skills/review-with-multi-debate/SKILL.md:52-60 requires three independent reviewers in parallel and assigns distinct roles.",
+        "/Users/admin/.codex/skills/review-with-multi-debate/SKILL.md:62-68 specifies the packet given to each reviewer: artifact, claim, decomposition, and JSON contract.",
+        "/Users/admin/.codex/skills/review-with-multi-debate/SKILL.md:69-75 specifies exactly one file per reviewer and requires evidence or missing-evidence recording for every criterion verdict.",
+        "/Users/admin/.codex/skills/review-with-multi-debate/SKILL.md:77-110 provides the reviewer JSON contract and verdict/evidence rules."
+      ],
+      "reasoning": "Round 1 is executable as written: it identifies reviewer count, roles, inputs, output file names, JSON structure, stable IDs, allowed verdicts, and evidence requirements. Reviewer separation is expressly required, even though the exact subagent mechanism is left to the host agent.",
+      "counterevidence": []
+    },
+    {
+      "id": "c4",
+      "text": "Aggregation and convergence semantics are internally coherent, criterion-level, and do not let mechanical aggregation alone overstate final audit status.",
+      "blocking": true,
+      "verdict": "pass",
+      "confidence": 0.83,
+      "evidence": [
+        "/Users/admin/.codex/skills/review-with-multi-debate/SKILL.md:112-118 instructs aggregation after each round using the skill aggregator script.",
+        "/Users/admin/.codex/skills/review-with-multi-debate/SKILL.md:120-130 defines mechanical aggregation outputs and criterion-level convergence as matching verdicts plus confidence spread at most 0.2.",
+        "/Users/admin/.codex/skills/review-with-multi-debate/SKILL.md:131 states full convergence also requires no unanswered counterevidence and that the main agent must check evidence quality and blocking status before declaring convergence.",
+        "/Users/admin/.codex/skills/review-with-multi-debate/SKILL.md:201 warns against defining convergence by matching overall verdicts instead of criterion-level agreement."
+      ],
+      "reasoning": "The convergence semantics are mostly coherent: mechanical agreement is criterion-level, and the skill explicitly prevents the script's mechanical summary from being treated as a full evidence-quality judgment. This directly addresses the risk of overstating final audit status from aggregation alone.",
+      "counterevidence": [
+        "/Users/admin/.codex/skills/review-with-multi-debate/SKILL.md:124-131 uses both 'round status' and 'full convergence'; readers must preserve that distinction manually."
+      ]
+    },
+    {
+      "id": "c5",
+      "text": "Re-audit and stop conditions are consistent: later rounds focus only disputed blocking criteria and stop without forcing consensus.",
+      "blocking": true,
+      "verdict": "pass",
+      "confidence": 0.76,
+      "evidence": [
+        "/Users/admin/.codex/skills/review-with-multi-debate/SKILL.md:135-138 says that if any blocking criterion is not fully converged, the agent should not re-run the full audit blindly.",
+        "/Users/admin/.codex/skills/review-with-multi-debate/SKILL.md:139-147 defines a disagreement packet with disputed criteria only and prior audit/summary context.",
+        "/Users/admin/.codex/skills/review-with-multi-debate/SKILL.md:148-153 requires reviewers to address only disputed criteria, accept or reject earlier reviewer points, and keep unchanged criteria out of scope.",
+        "/Users/admin/.codex/skills/review-with-multi-debate/SKILL.md:162-170 stops after convergence or iteration 3, and says unresolved blocking disagreement must be reported rather than forced into consensus."
+      ],
+      "reasoning": "The stop rule is consistent and explicitly avoids forced consensus. The re-audit rule is directionally consistent with disputed-blocking focus because re-audit is triggered by unresolved blocking criteria and unchanged criteria are out of scope.",
+      "counterevidence": [
+        "/Users/admin/.codex/skills/review-with-multi-debate/SKILL.md:139-147 says 'disputed criteria only' rather than 'disputed blocking criteria only', while /Users/admin/.codex/skills/review-with-multi-debate/SKILL.md:133 allows final convergence even when non-blocking criteria still differ slightly. This leaves a small scope ambiguity about whether disputed non-blocking criteria should be included in later-round packets when blocking disputes also exist."
+      ]
+    },
+    {
+      "id": "c6",
+      "text": "Output contract and final answer guidance give enough information for users to inspect the audit trail.",
+      "blocking": false,
+      "verdict": "pass",
+      "confidence": 0.9,
+      "evidence": [
+        "/Users/admin/.codex/skills/review-with-multi-debate/SKILL.md:172-183 requires three reviewer JSON files and one summary JSON file per iteration and recommends summary names.",
+        "/Users/admin/.codex/skills/review-with-multi-debate/SKILL.md:185-191 requires the final user-facing answer to report final status, blocking criteria, disputed criteria, main evidence, and whether the audit converged or stopped unresolved.",
+        "/Users/admin/.codex/skills/review-with-multi-debate/SKILL.md:69-75 and 105-110 require evidence-bound criterion verdicts and stable IDs, supporting inspectable audit trails."
+      ],
+      "reasoning": "The output guidance is sufficient for inspection: users get per-reviewer JSON, per-iteration summaries, stable criterion IDs, evidence fields, disputed criteria, and final status language.",
+      "counterevidence": []
+    }
+  ],
+  "open_questions": [
+    "Should later-round disagreement packets explicitly exclude disputed non-blocking criteria once all blocking criteria are converged, or should non-blocking disputes ever be re-audited for completeness?"
+  ],
+  "disputed_points_if_any": [
+    {
+      "criterion_id": "c5",
+      "point": "The skill mostly supports disputed-blocking re-audits, but the phrase 'disputed criteria only' is less precise than the claim's 'disputed blocking criteria' and could cause unnecessary re-audit of non-blocking disputes."
+    }
+  ]
+}

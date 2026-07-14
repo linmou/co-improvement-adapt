@@ -1,0 +1,72 @@
+{
+  "feature_name": "co_improvement_adapt_skill_materialization",
+  "phase": "red",
+  "iteration": 1,
+  "reviewer_id": "audit1",
+  "claim": "The red phase adds only the next failing test, and the failure is caused by missing behavior rather than syntax, environment, or unrelated breakage.",
+  "overall_verdict": "pass",
+  "overall_confidence": 0.82,
+  "criteria": [
+    {
+      "id": "c1",
+      "text": "Red changed only test-scope files.",
+      "blocking": true,
+      "verdict": "pass",
+      "confidence": 0.72,
+      "evidence": [
+        "Artifact states the only red change is tests/test_skill_materialization_semantics.py.",
+        "The test file is test-scoped and contains only unittest assertions against SKILL.md and references/local-skill-output.md.",
+        "Independent git verification was unavailable because /Users/admin/.codex/skills/co-improvement-adapt is not a git repository."
+      ],
+      "reasoning": "Given the supplied artifact record, the red change is limited to a test file. I could not independently verify the changed-file set with git, so this pass depends partly on the artifact metadata rather than repository diff evidence.",
+      "counterevidence": []
+    },
+    {
+      "id": "c2",
+      "text": "The test specifies the smallest useful behavior for the two high issues: local-skill materialization and installed-directory script resolution.",
+      "blocking": true,
+      "verdict": "pass",
+      "confidence": 0.86,
+      "evidence": [
+        "tests/test_skill_materialization_semantics.py has two focused tests.",
+        "test_local_skill_mode_requires_materialization_gate asserts the presence of State 1.5, Materialize Local Skill Gate, creation/update of the target local skill folder, generated SKILL.md writing, and a gated transition to State 2.",
+        "test_helper_scripts_are_resolved_from_installed_skill_directories asserts placeholders for <co_improvement_adapt_skill_dir>/scripts/bootstrap_memory_artifacts.sh, <skill_creator_skill_dir>/scripts/init_skill.py, <skill_creator_skill_dir>/scripts/quick_validate.py, and guidance not to assume the target repository has its own scripts folder."
+      ],
+      "reasoning": "The tests are narrow semantic checks against the exact missing workflow instructions. They do not add broad implementation expectations, new runtime machinery, or unrelated validation.",
+      "counterevidence": []
+    },
+    {
+      "id": "c3",
+      "text": "The failure is caused by missing behavior in SKILL.md/local-skill-output.md, not syntax, missing environment, or unrelated breakage.",
+      "blocking": true,
+      "verdict": "pass",
+      "confidence": 0.94,
+      "evidence": [
+        "Targeted command python tests/test_skill_materialization_semantics.py executed successfully as a unittest program.",
+        "The run reported Ran 2 tests and FAILED with failures=2.",
+        "Both failures are AssertionError failures for missing expected strings.",
+        "There were no syntax errors, import errors, filesystem errors, or missing dependency errors in the targeted command."
+      ],
+      "reasoning": "The targeted red command reaches the assertions and fails on absent required semantics. That is a real red failure caused by missing behavior in the skill/reference documentation.",
+      "counterevidence": []
+    },
+    {
+      "id": "c4",
+      "text": "No production/spec files were changed during red.",
+      "blocking": true,
+      "verdict": "pass",
+      "confidence": 0.72,
+      "evidence": [
+        "Artifact states no production/spec markdown files were edited in red.",
+        "The failing assertions inspect SKILL.md and references/local-skill-output.md and show the expected behavior is still absent there.",
+        "Independent git verification was unavailable because the current directory is not inside a git repository."
+      ],
+      "reasoning": "The observed failure mode is consistent with production/spec files not yet being updated.",
+      "counterevidence": []
+    }
+  ],
+  "open_questions": [
+    "Can the red change set be verified from an external VCS diff or patch artifact? The local directory is not a git repository, so I could not independently prove the full file-change boundary."
+  ],
+  "disputed_points_if_any": []
+}

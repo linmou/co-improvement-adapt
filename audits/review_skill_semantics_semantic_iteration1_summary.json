@@ -1,0 +1,106 @@
+{
+  "feature_name": "review_skill_semantics",
+  "phase": "semantic",
+  "iteration": 1,
+  "reviewer_count": 3,
+  "status": "converged",
+  "disputed_criteria": [],
+  "criteria": {
+    "c1": {
+      "criterion_text": "Trigger conditions clearly define when to use and not use the skill, without obvious overlap that would cause misuse.",
+      "reviewer_count": 3,
+      "verdicts": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "confidences": [
+        0.82,
+        0.86,
+        0.82
+      ],
+      "final_verdict": "pass",
+      "converged": true
+    },
+    "c2": {
+      "criterion_text": "Input normalization and criterion decomposition are operationally clear enough for an agent to produce 3-7 stable, checkable criteria before reviewer launch.",
+      "reviewer_count": 3,
+      "verdicts": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "confidences": [
+        0.9,
+        0.92,
+        0.86
+      ],
+      "final_verdict": "pass",
+      "converged": true
+    },
+    "c3": {
+      "criterion_text": "Round-1 reviewer workflow is executable and preserves reviewer separation with structured evidence-bound JSON output.",
+      "reviewer_count": 3,
+      "verdicts": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "confidences": [
+        0.92,
+        0.94,
+        0.88
+      ],
+      "final_verdict": "pass",
+      "converged": true
+    },
+    "c4": {
+      "criterion_text": "Aggregation and convergence semantics are internally coherent, criterion-level, and do not let mechanical aggregation alone overstate final audit status.",
+      "reviewer_count": 3,
+      "verdicts": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "confidences": [
+        0.88,
+        0.9,
+        0.83
+      ],
+      "final_verdict": "pass",
+      "converged": true
+    },
+    "c5": {
+      "criterion_text": "Re-audit and stop conditions are consistent: later rounds focus only disputed blocking criteria and stop without forcing consensus.",
+      "reviewer_count": 3,
+      "verdicts": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "confidences": [
+        0.86,
+        0.88,
+        0.76
+      ],
+      "final_verdict": "pass",
+      "converged": true
+    },
+    "c6": {
+      "criterion_text": "Output contract and final answer guidance give enough information for users to inspect the audit trail.",
+      "reviewer_count": 3,
+      "verdicts": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "confidences": [
+        0.89,
+        0.87,
+        0.9
+      ],
+      "final_verdict": "pass",
+      "converged": true
+    }
+  }
+}

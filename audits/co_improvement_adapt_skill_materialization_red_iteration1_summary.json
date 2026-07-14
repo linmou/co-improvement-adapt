@@ -1,0 +1,81 @@
+{
+  "feature_name": "co_improvement_adapt_skill_materialization",
+  "phase": "red",
+  "iteration": 1,
+  "reviewer_count": 3,
+  "status": "not_converged",
+  "disputed_criteria": [
+    "c1",
+    "c4"
+  ],
+  "criteria": {
+    "c1": {
+      "criterion_text": "Red changed only test-scope files.",
+      "reviewer_count": 3,
+      "verdicts": [
+        "pass",
+        "insufficient_evidence",
+        "pass"
+      ],
+      "confidences": [
+        0.72,
+        0.55,
+        0.72
+      ],
+      "final_verdict": "disputed",
+      "converged": false
+    },
+    "c2": {
+      "criterion_text": "The test specifies the smallest useful behavior for the two high issues: local-skill materialization and installed-directory script resolution.",
+      "reviewer_count": 3,
+      "verdicts": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "confidences": [
+        0.86,
+        0.86,
+        0.84
+      ],
+      "final_verdict": "pass",
+      "converged": true
+    },
+    "c3": {
+      "criterion_text": "The failure is caused by missing behavior in SKILL.md/local-skill-output.md, not syntax, missing environment, or unrelated breakage.",
+      "reviewer_count": 3,
+      "verdicts": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "confidences": [
+        0.94,
+        0.94,
+        0.95
+      ],
+      "final_verdict": "pass",
+      "converged": true
+    },
+    "c4": {
+      "criterion_text": "No production/spec files were changed during red.",
+      "reviewer_count": 3,
+      "verdicts": [
+        "pass",
+        "insufficient_evidence",
+        "pass"
+      ],
+      "confidences": [
+        0.72,
+        0.55,
+        0.76
+      ],
+      "final_verdict": "disputed",
+      "converged": false
+    }
+  },
+  "main_agent_resolution": {
+    "status": "accepted_with_scope_evidence",
+    "reason": "The dedicated phase monitor returned PASS for red scope using the changed-file list, and the skill directory is not a git repository, which explains audit2's insufficient_evidence on c1/c4."
+  }
+}

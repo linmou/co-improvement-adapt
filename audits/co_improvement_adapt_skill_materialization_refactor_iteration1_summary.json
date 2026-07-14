@@ -1,0 +1,90 @@
+{
+  "feature_name": "co_improvement_adapt_skill_materialization",
+  "phase": "refactor",
+  "iteration": 1,
+  "reviewer_count": 3,
+  "status": "converged",
+  "disputed_criteria": [],
+  "criteria": {
+    "c1": {
+      "criterion_text": "Changed production/spec files are limited to SKILL.md and references/local-skill-output.md.",
+      "reviewer_count": 3,
+      "verdicts": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "confidences": [
+        0.74,
+        0.76,
+        0.75
+      ],
+      "final_verdict": "pass",
+      "converged": true
+    },
+    "c2": {
+      "criterion_text": "The final changes implement both requested high issues and nothing broader.",
+      "reviewer_count": 3,
+      "verdicts": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "confidences": [
+        0.92,
+        0.94,
+        0.93
+      ],
+      "final_verdict": "pass",
+      "converged": true
+    },
+    "c3": {
+      "criterion_text": "Targeted and full available regression checks pass.",
+      "reviewer_count": 3,
+      "verdicts": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "confidences": [
+        0.95,
+        0.96,
+        0.96
+      ],
+      "final_verdict": "pass",
+      "converged": true
+    },
+    "c4": {
+      "criterion_text": "No hidden fallback, broad redesign, or unrelated behavior is introduced.",
+      "reviewer_count": 3,
+      "verdicts": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "confidences": [
+        0.89,
+        0.9,
+        0.9
+      ],
+      "final_verdict": "pass",
+      "converged": true
+    },
+    "c5": {
+      "criterion_text": "The final wording is operationally clearer or no worse than before.",
+      "reviewer_count": 3,
+      "verdicts": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "confidences": [
+        0.88,
+        0.9,
+        0.9
+      ],
+      "final_verdict": "pass",
+      "converged": true
+    }
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "feature_name": "co_improvement_adapt_skill_materialization",
+  "phase": "refactor",
+  "iteration": 1,
+  "reviewer_id": "audit2",
+  "claim": "The final production diff from pre-Green to post-Refactor implements only the behavior required by the request map and red tests, avoids speculative logic or hidden fallbacks, preserves passing regression results, and leaves the code simpler or no worse than before.",
+  "overall_verdict": "pass",
+  "overall_confidence": 0.88,
+  "criteria": [
+    {
+      "id": "c1",
+      "text": "Changed production/spec files are limited to SKILL.md and references/local-skill-output.md.",
+      "blocking": true,
+      "verdict": "pass",
+      "confidence": 0.76,
+      "evidence": [
+        "The provided artifact states that production/spec files changed after red are SKILL.md and references/local-skill-output.md.",
+        "Inspection found the requested behavior only in SKILL.md and references/local-skill-output.md."
+      ],
+      "reasoning": "The current production/spec material relevant to the feature is confined to the two named Markdown files.",
+      "counterevidence": [
+        "No git metadata is available to independently verify the complete changed-file boundary."
+      ]
+    },
+    {
+      "id": "c2",
+      "text": "The final changes implement both requested high issues and nothing broader.",
+      "blocking": true,
+      "verdict": "pass",
+      "confidence": 0.94,
+      "evidence": [
+        "SKILL.md State 1 routes draft-workflow-only directly to State 2 and local-skill to State 1.5 after DRAFT_OK.",
+        "State 1.5 is titled Materialize Local Skill Gate and requires creating/updating the target local skill folder.",
+        "State 1.5 resolves helper scripts from installed skill directories.",
+        "State 3 uses <co_improvement_adapt_skill_dir>/scripts/bootstrap_memory_artifacts.sh instead of a fragile relative path.",
+        "references/local-skill-output.md repeats helper resolution, materialization steps, and quick_validate.py validation."
+      ],
+      "reasoning": "The edits map directly to the two high issues and do not introduce additional workflow redesign beyond the minimal routing and materialization wording needed.",
+      "counterevidence": []
+    },
+    {
+      "id": "c3",
+      "text": "Targeted and full available regression checks pass.",
+      "blocking": true,
+      "verdict": "pass",
+      "confidence": 0.96,
+      "evidence": [
+        "python tests/test_skill_materialization_semantics.py: 2 tests passed.",
+        "python -m unittest discover -s tests: 2 tests passed.",
+        "python /Users/admin/.codex/skills/.system/skill-creator/scripts/quick_validate.py /Users/admin/.codex/skills/co-improvement-adapt: Skill is valid!"
+      ],
+      "reasoning": "The targeted red tests, available unittest suite, and skill validator all pass.",
+      "counterevidence": []
+    },
+    {
+      "id": "c4",
+      "text": "No hidden fallback, broad redesign, or unrelated behavior is introduced.",
+      "blocking": true,
+      "verdict": "pass",
+      "confidence": 0.9,
+      "evidence": [
+        "State 1.5 says helper scripts come from installed skill directories and explicitly says not to assume the target repository has its own scripts folder.",
+        "Validation failure is not hidden: State 1.5 requires recording why validation could not run.",
+        "The existing lifecycle remains intact with State 1.5 inserted only for local-skill mode."
+      ],
+      "reasoning": "The change is a narrow gate insertion and path-resolution clarification.",
+      "counterevidence": [
+        "The phrase 'when practical' in the init_skill.py instruction leaves some discretion, bounded by later hard requirements."
+      ]
+    },
+    {
+      "id": "c5",
+      "text": "The final wording is operationally clearer or no worse than before.",
+      "blocking": false,
+      "verdict": "pass",
+      "confidence": 0.9,
+      "evidence": [
+        "State 1.5 gives a concrete sequence for resolving helper scripts, writing files, validation, and transition.",
+        "references/local-skill-output.md now has a dedicated Target Location section covering helper script resolution and materialization."
+      ],
+      "reasoning": "The wording is more executable than a generic instruction to produce a local skill.",
+      "counterevidence": [
+        "The installed skill directory placeholders are not defined by a discovery algorithm in the text itself."
+      ]
+    }
+  ],
+  "open_questions": [
+    "The exact pre-Green to post-Refactor diff boundary could not be independently verified from version control.",
+    "There is no end-to-end test that actually materializes a temporary local skill folder through State 1.5."
+  ],
+  "disputed_points_if_any": []
+}

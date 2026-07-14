@@ -1,0 +1,63 @@
+{
+  "feature_name": "co_improvement_adapt_skill_materialization",
+  "phase": "red",
+  "iteration": 1,
+  "reviewer_id": "audit2",
+  "claim": "The red phase adds only the next failing test, and the failure is caused by missing behavior rather than syntax, environment, or unrelated breakage.",
+  "overall_verdict": "insufficient_evidence",
+  "overall_confidence": 0.78,
+  "criteria": [
+    {
+      "id": "c1",
+      "text": "Red changed only test-scope files.",
+      "blocking": true,
+      "verdict": "insufficient_evidence",
+      "confidence": 0.55,
+      "evidence": [],
+      "reasoning": "The named changed file is correctly test-scoped, but without VCS metadata or a supplied diff this reviewer could not independently prove no other files were changed during red.",
+      "counterevidence": []
+    },
+    {
+      "id": "c2",
+      "text": "The test specifies the smallest useful behavior for the two high issues: local-skill materialization and installed-directory script resolution.",
+      "blocking": true,
+      "verdict": "pass",
+      "confidence": 0.86,
+      "evidence": [
+        "tests/test_skill_materialization_semantics.py contains two unittest cases, one for a local-skill materialization gate and one for installed skill directory script resolution.",
+        "The tests map directly to the two stated missing behaviors."
+      ],
+      "reasoning": "The red test is narrow: two tests map directly to the two stated missing behaviors.",
+      "counterevidence": []
+    },
+    {
+      "id": "c3",
+      "text": "The failure is caused by missing behavior in SKILL.md/local-skill-output.md, not syntax, missing environment, or unrelated breakage.",
+      "blocking": true,
+      "verdict": "pass",
+      "confidence": 0.94,
+      "evidence": [
+        "Targeted command python tests/test_skill_materialization_semantics.py ran successfully under stdlib unittest and executed 2 tests.",
+        "The result was 2 assertion failures, not import errors, syntax errors, command-not-found errors, or missing dependency errors."
+      ],
+      "reasoning": "The test harness is healthy enough to run. The failures are exactly unmet semantic expectations in the Markdown artifacts.",
+      "counterevidence": []
+    },
+    {
+      "id": "c4",
+      "text": "No production/spec files were changed during red.",
+      "blocking": true,
+      "verdict": "insufficient_evidence",
+      "confidence": 0.55,
+      "evidence": [],
+      "reasoning": "The observed files are consistent with the claim, but without git metadata this reviewer could not independently confirm the complete red-phase diff.",
+      "counterevidence": []
+    }
+  ],
+  "open_questions": [
+    "Can the red-phase diff or changed-file list be supplied from the repository that produced this artifact?"
+  ],
+  "disputed_points_if_any": [
+    "Overall verdict is insufficient_evidence only because changed-file criteria require diff-level evidence unavailable in this workspace."
+  ]
+}

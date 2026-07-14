@@ -1,0 +1,94 @@
+{
+  "feature_name": "co_improvement_adapt_skill_materialization",
+  "phase": "refactor",
+  "iteration": 1,
+  "reviewer_id": "audit1",
+  "claim": "The final production diff from pre-Green to post-Refactor implements only the behavior required by the request map and red tests, avoids speculative logic or hidden fallbacks, preserves passing regression results, and leaves the code simpler or no worse than before.",
+  "overall_verdict": "pass",
+  "overall_confidence": 0.86,
+  "criteria": [
+    {
+      "id": "c1",
+      "text": "Changed production/spec files are limited to SKILL.md and references/local-skill-output.md.",
+      "blocking": true,
+      "verdict": "pass",
+      "confidence": 0.74,
+      "evidence": [
+        "Current production/spec inspection focused on SKILL.md and references/local-skill-output.md.",
+        "The test file tests/test_skill_materialization_semantics.py exists and is outside the production/spec file set."
+      ],
+      "reasoning": "The visible implementation evidence is concentrated in the two stated documentation/spec files. There is no git metadata, so this pass relies on monitor and filesystem evidence.",
+      "counterevidence": [
+        "The directory is not a git repository, so pre-Green to post-Refactor scope cannot be independently verified with git diff."
+      ]
+    },
+    {
+      "id": "c2",
+      "text": "The final changes implement both requested high issues and nothing broader.",
+      "blocking": true,
+      "verdict": "pass",
+      "confidence": 0.92,
+      "evidence": [
+        "SKILL.md now routes local-skill mode from State 1 to State 1.5 after DRAFT_OK.",
+        "State 1.5 explicitly requires resolving helper scripts from installed skill directories.",
+        "State 1.5 requires creating/updating the target local skill folder and writing generated SKILL.md plus needed files.",
+        "State 3 now uses <co_improvement_adapt_skill_dir>/scripts/bootstrap_memory_artifacts.sh.",
+        "references/local-skill-output.md repeats installed-directory helper resolution, materialization steps, and quick_validate invocation."
+      ],
+      "reasoning": "The changes directly address materializing the local skill folder and avoiding repo-relative helper-script assumptions. The added State 1.5 is a narrow lifecycle gate.",
+      "counterevidence": [
+        "Validation may be recorded as blocked if it cannot run, but that path is explicit rather than hidden."
+      ]
+    },
+    {
+      "id": "c3",
+      "text": "Targeted and full available regression checks pass.",
+      "blocking": true,
+      "verdict": "pass",
+      "confidence": 0.95,
+      "evidence": [
+        "python tests/test_skill_materialization_semantics.py: 2 tests passed.",
+        "python -m unittest discover -s tests: 2 tests passed.",
+        "python /Users/admin/.codex/skills/.system/skill-creator/scripts/quick_validate.py /Users/admin/.codex/skills/co-improvement-adapt: Skill is valid!"
+      ],
+      "reasoning": "The targeted semantic tests, full available unittest suite, and local skill validation all pass.",
+      "counterevidence": [
+        "The available tests are semantic string-presence tests and do not simulate a full end-to-end skill materialization run."
+      ]
+    },
+    {
+      "id": "c4",
+      "text": "No hidden fallback, broad redesign, or unrelated behavior is introduced.",
+      "blocking": true,
+      "verdict": "pass",
+      "confidence": 0.89,
+      "evidence": [
+        "State 1.5 applies only to local-skill mode after DRAFT_OK.",
+        "Helper paths are explicit installed-skill-directory placeholders.",
+        "Validation failure/non-execution must be recorded.",
+        "Existing State 2, State 3, and State 4 lifecycle remains structurally intact."
+      ],
+      "reasoning": "The change makes intended local-skill behavior concrete without adding speculative execution paths or broad lifecycle redesign.",
+      "counterevidence": []
+    },
+    {
+      "id": "c5",
+      "text": "The final wording is operationally clearer or no worse than before.",
+      "blocking": false,
+      "verdict": "pass",
+      "confidence": 0.88,
+      "evidence": [
+        "State 1.5 gives a concrete sequence: resolve scripts, initialize or patch, write files, validate, confirm path, then transition.",
+        "references/local-skill-output.md separates target location, helper resolution, materialization, required skill shape, memory packaging, and validation checklist."
+      ],
+      "reasoning": "The instructions are more operational and the added detail is proportional to the failure mode.",
+      "counterevidence": [
+        "The placeholder variables are named but not mechanically discovered."
+      ]
+    }
+  ],
+  "open_questions": [
+    "The exact final diff cannot be independently enumerated from git because this skill directory is not a git repository."
+  ],
+  "disputed_points_if_any": []
+}
