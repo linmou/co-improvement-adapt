@@ -29,7 +29,7 @@ class SkillMaterializationSemanticsTest(unittest.TestCase):
         local_skill_output = read_text(LOCAL_SKILL_OUTPUT)
         combined = f"{skill_text}\n{local_skill_output}"
 
-        self.assertIn("<co_improvement_adapt_skill_dir>/scripts/bootstrap_memory_artifacts.sh", combined)
+        self.assertIn("<persist_rubrics_context_skill_dir>/scripts/bootstrap_memory_artifacts.sh", combined)
         self.assertIn("<skill_creator_skill_dir>/scripts/init_skill.py", combined)
         self.assertIn("<skill_creator_skill_dir>/scripts/quick_validate.py", combined)
         self.assertIn("do not assume the target repository has its own `scripts/` folder", combined)

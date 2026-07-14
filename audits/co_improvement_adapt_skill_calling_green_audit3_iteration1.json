@@ -1,0 +1,160 @@
+{
+  "feature_name": "co_improvement_adapt_skill_calling",
+  "phase": "green",
+  "iteration": 1,
+  "reviewer_id": "audit3",
+  "claim": "co-improvement-adapt correctly structures its lifecycle and how it calls other skills/helpers: (1) memory writes go only through subagent($persist-rubrics-context) using a thin Request/Response client adapter and callee call-contract; (2) skill-creator init/quick_validate are only for local-skill materialization (State 1.5); (3) reflection is an internal procedure (references), not a separate skill call; (4) dependency is one-way (adapt imports persist; adapt does not own write engine).",
+  "overall_verdict": "pass",
+  "overall_confidence": 0.86,
+  "criteria": [
+    {
+      "id": "c1",
+      "text": "Learn interrupt and State 3 explicitly spawn subagent($persist-rubrics-context) with Request builders and Response merge documented.",
+      "blocking": true,
+      "verdict": "pass",
+      "confidence": 0.93,
+      "evidence": [
+        "/Users/admin/.codex/skills/co-improvement-adapt/SKILL.md:40 rule 12: spawn subagent running $persist-rubrics-context via references/persist-learnings-skill.md + callee call-contract.md.",
+        "/Users/admin/.codex/skills/co-improvement-adapt/SKILL.md:48 Learn event → subagent($persist-rubrics-context) → resume prior state.",
+        "/Users/admin/.codex/skills/co-improvement-adapt/SKILL.md:102-107 Learn interrupt: Request (caller_tag learn-interrupt) → subagent sole task $persist-rubrics-context → Response → merge learning_log_row → resume State 2.",
+        "/Users/admin/.codex/skills/co-improvement-adapt/SKILL.md:127-131 State 3: write engine remains subagent; state3-pending-flush and state3-missed-scan spawn subagent; merge Response before PERSIST_OK.",
+        "/Users/admin/.codex/skills/co-improvement-adapt/references/persist-learnings-skill.md:12-13 host event → build Request → subagent($persist-rubrics-context) → Response → merge session log → resume host.",
+        "/Users/admin/.codex/skills/co-improvement-adapt/references/persist-learnings-skill.md:32-56 Request builders + Response merge (version 1, learning_log_row, status/writes/validation)."
+      ],
+      "reasoning": "Operational learn/State 3 paths all route memory writes through subagent($persist-rubrics-context) with documented Request builders and Response merge. No second host procedure reimplements learnt JSON writes. Residual risks are wording escapes that could tempt a dual path, not an actual alternate write implementation in adapt.",
+      "counterevidence": [
+        "/Users/admin/.codex/skills/co-improvement-adapt/references/local-skill-output.md:79 allows generated skills to use subagent($persist-rubrics-context) 'or an equivalent subagent procedure' — soft exclusive-path language for produced skills (scope: generated skill template, not host runtime).",
+        "/Users/admin/.codex/skills/co-improvement-adapt/SKILL.md:168-170 progressive disclosure lists persist memory-protocol.md as 'storage execution only' on the host skill surface; adapter says those assets are used only inside the subagent — doc scope mismatch that could tempt host-side execution if misread.",
+        "/Users/admin/.codex/skills/persist-rubrics-context/references/memory-protocol.md:24 precondition allows decision recorded by $persist-rubrics-context 'or an equivalent host gate' — callee-side dual-path language (not an adapt-owned writer)."
+      ]
+    },
+    {
+      "id": "c2",
+      "text": "Response/Request schema SoT is callee call-contract.md; adapt does not redefine schema fields.",
+      "blocking": true,
+      "verdict": "pass",
+      "confidence": 0.9,
+      "evidence": [
+        "/Users/admin/.codex/skills/co-improvement-adapt/references/persist-learnings-skill.md:3-7 host does not redefine Response schemas; Contract SoT = persist-rubrics-context/references/call-contract.md.",
+        "/Users/admin/.codex/skills/co-improvement-adapt/references/persist-learnings-skill.md:26-27 / 52-53: use Response as-is; require version 1 JSON per call-contract.",
+        "/Users/admin/.codex/skills/co-improvement-adapt/SKILL.md:35 rule 7 and :169 progressive disclosure name call-contract as Request/Response SoT; forbid inventing Learning Log schemas.",
+        "/Users/admin/.codex/skills/persist-rubrics-context/references/call-contract.md exists (version 1); schema owned by callee; callers must not redefine fields."
+      ],
+      "reasoning": "call-contract.md is present on persist and is the named SoT. Adapt adapter embeds Request example shapes as builders, not a competing schema document. No alternate Response field ownership found under adapt.",
+      "counterevidence": [
+        "references/persist-learnings-skill.md embeds full Request JSON examples and documents host-specific caller_tag values (learn-interrupt, state3-pending-flush, state3-missed-scan). A careless agent could treat the adapter as schema owner; file text still points SoT at call-contract.",
+        "Adapter mentions propose_only for missed scan without fully restating call-contract decision_mode table — incomplete projection risk, not a second schema."
+      ]
+    },
+    {
+      "id": "c3",
+      "text": "Coupling is one-way: adapt points to persist skill; adapt does not ship write-engine assets (no local memory-protocol/validator scripts).",
+      "blocking": true,
+      "verdict": "pass",
+      "confidence": 0.97,
+      "evidence": [
+        "Directory listing of /Users/admin/.codex/skills/co-improvement-adapt: no scripts/ directory (confirmed missing path).",
+        "references/ under adapt: cognitive-budget-estimation.md, local-skill-output.md, meta-method.md, persist-learnings-skill.md, reflection-paradigm.md, rubric.md — no memory-protocol, no persistence rubrics, no entry templates.",
+        "references/persist-learnings-skill.md:1-4 one-way import; does not own write mechanics; 23-26 no inline writes / no ship or copy of memory-protocol/validators; 58-59 assets only under persist skill path.",
+        "SKILL.md:168-170 write engine + call-contract + memory-protocol all rooted under persist-rubrics-context/.",
+        "/Users/admin/.codex/skills/persist-rubrics-context holds scripts/validate_rubric_memory.py, scripts/bootstrap_memory_artifacts.sh, references/memory-protocol.md, and references/call-contract.md.",
+        "persist-rubrics-context/tests/test_skill_semantics.py:70-76 asserts callee docs do not mention co-improvement-adapt or $co-improvement-adapt.",
+        "adapt tests/test_memory_boundary.py PRUNED_PATHS assert write-engine assets absent from adapt."
+      ],
+      "reasoning": "Filesystem and docs match claim (4): adapt imports persist; adapt does not own the write engine. scripts/ does not exist under adapt. call-contract exists under persist. Reverse dependency is explicitly tested absent on the callee.",
+      "counterevidence": [
+        "State 1.5 / local-skill-output allow the host to invoke <persist_rubrics_context_skill_dir>/scripts/bootstrap_memory_artifacts.sh directly (outside subagent) when materializing skills that need learnt helpers — uses a persist script without the Request/Response path, but for bootstrap scaffolding not learnt JSON writes."
+      ]
+    },
+    {
+      "id": "c4",
+      "text": "skill_creator init_skill.py and quick_validate.py appear only as materialization helpers (State 1.5 / local-skill-output), not as co-review or persist writers.",
+      "blocking": true,
+      "verdict": "pass",
+      "confidence": 0.96,
+      "evidence": [
+        "SKILL.md:82-92 State 1.5 only place that resolves/runs init_skill.py and quick_validate.py from skill_creator_skill_dir.",
+        "SKILL.md:158 completion criterion 7: quick_validate only if a local skill was produced.",
+        "references/local-skill-output.md:21-29,97-105 materialization + validation checklist; rubric memory validation explicitly deferred to $persist-rubrics-context subagent, not quick_validate.",
+        "SKILL.md State 2 (98-125) and State 3 (127-136) contain no init_skill.py / quick_validate.py references; persist uses subagent only.",
+        "skill-creator scripts exist at installed skill-creator path (init_skill.py, quick_validate.py); they are not shipped under adapt."
+      ],
+      "reasoning": "skill-creator helpers are confined to local-skill materialization (State 1.5 / local-skill-output / completion of produced skills). They are not dual writers for learnt memory or co-review scoring.",
+      "counterevidence": []
+    },
+    {
+      "id": "c5",
+      "text": "State 3 is documented as audit gate only (PERSIST_OK, pending flush via subagent), not as implementer of JSON memory writes.",
+      "blocking": true,
+      "verdict": "pass",
+      "confidence": 0.95,
+      "evidence": [
+        "SKILL.md:127-128 State 3: audit only; write engine remains subagent($persist-rubrics-context); does not implement memory writes.",
+        "SKILL.md:129-135 Learning Log audit, pending flush via subagent Request, missed-candidate scan via subagent or intentional skip, PERSIST_OK only after no pending; only this gate collects PERSIST_OK.",
+        "SKILL.md:32 / :159 host never inlines JSON memory writes; State 3 audits session rows rather than writing memory inline.",
+        "references/persist-learnings-skill.md:21 PERSIST_OK is host token only; never issued by write skill."
+      ],
+      "reasoning": "State 3 is a permanent host audit/fallback gate. Writes still go through subagent on pending flush/missed scan. No inline learnt-JSON procedure is specified for State 3.",
+      "counterevidence": [
+        "SKILL.md:132 'capture last-minute learnings' if log empty after scan is terse; it does not restate 'via subagent' on that bullet (surrounding bullets do). Minor omission risk, not a second write engine."
+      ]
+    },
+    {
+      "id": "c6",
+      "text": "Reflection is invoked via references/reflection-paradigm.md (internal), not as $another-skill.",
+      "blocking": false,
+      "verdict": "pass",
+      "confidence": 0.88,
+      "evidence": [
+        "SKILL.md:49 Reflect event → run reflection flow (no $skill).",
+        "SKILL.md:108 Reflect interrupt: run references/reflection-paradigm.md; append Reflection Log; resume.",
+        "SKILL.md:138-145 State 4 fallback uses cognitive-budget-estimation.md + reflection-paradigm.md; REFLECT_OK only here.",
+        "SKILL.md:173 progressive disclosure lists references/reflection-paradigm.md under this skill.",
+        "references/reflection-paradigm.md is an internal procedure (triggers, scaffold depths, output schema); no $reflection-* skill call."
+      ],
+      "reasoning": "Executable reflection paths are in-skill references, not subagent skill calls. Contrast with persist, which always names $persist-rubrics-context. One bridge sentence over-calls both as 'skills', which is a real wording contradiction but not an alternate call graph.",
+      "counterevidence": [
+        "SKILL.md:96 'use event-driven skills for learning/reflection' pluralizes 'skills' for both learning and reflection, contradicting claim (3) and the Reflect interrupt which is not a skill call.",
+        "Filename references/persist-learnings-skill.md uses 'skill' for a thin client adapter (not a $skill invocation), adding naming noise near the skill-calling surface.",
+        "No separate $reflect skill is defined or installed — good — but line 96 reads as if such a skill call existed."
+      ]
+    },
+    {
+      "id": "c7",
+      "text": "Helper scripts are resolved from installed skill directories (skill_creator / persist_rubrics_context), not assumed in the target repo.",
+      "blocking": false,
+      "verdict": "pass",
+      "confidence": 0.94,
+      "evidence": [
+        "SKILL.md:83-91 State 1.5 resolves <skill_creator_skill_dir> and <persist_rubrics_context_skill_dir>; 'do not assume the target repository has its own scripts/ folder'.",
+        "references/local-skill-output.md:19-23 same installed-skill resolution for init_skill.py, quick_validate.py, bootstrap_memory_artifacts.sh.",
+        "adapt has no scripts/ tree; helpers are not owned here.",
+        "tests/test_memory_boundary.py:86-92 bootstrap must point at persist_rubrics_context_skill_dir; forbids <co_improvement_adapt_skill_dir>/scripts/bootstrap_memory_artifacts.sh."
+      ],
+      "reasoning": "Helper resolution is consistently from installed skill dirs. Absence of adapt/scripts/ and explicit ban on assuming target-repo scripts support the claim.",
+      "counterevidence": [
+        "Placeholders <skill_creator_skill_dir> / <persist_rubrics_context_skill_dir> are not absolute paths; operator must resolve them. Bounded ambiguity, not an undefined skill call.",
+        "Optional bootstrap in State 1.5 is a direct script invocation (not Request/Response), separate from memory-write calling model — document as helper vs write-engine boundary."
+      ]
+    }
+  ],
+  "open_questions": [
+    "Should SKILL.md:96 be rewritten to 'event-driven persist skill + internal reflection procedure' to remove the false implication that reflection is a skill call?",
+    "Should progressive disclosure drop or re-label memory-protocol.md so hosts do not treat 'storage execution only' as an in-host write path?",
+    "Should local-skill-output.md:79 drop 'or an equivalent subagent procedure' to keep the exclusive $persist-rubrics-context path for generated skills?"
+  ],
+  "disputed_points_if_any": [
+    {
+      "criterion_id": "c1",
+      "point": "No dual write-engine under adapt, but three soft dual-path temptations exist: generated-skill 'equivalent procedure' wording, host progressive disclosure of memory-protocol, and callee memory-protocol 'equivalent host gate'. None implement a second write path in adapt; all are doc leakage."
+    },
+    {
+      "criterion_id": "c6",
+      "point": "Claim (3) holds operationally (reflection-paradigm.md only), but SKILL.md:96 is a real wording contradiction that can be misread as a missing $reflection skill call."
+    },
+    {
+      "criterion_id": "c3",
+      "point": "Host may run persist bootstrap_memory_artifacts.sh outside subagent during State 1.5 materialization; this does not re-own the write engine but is a second invocation style for a persist asset."
+    }
+  ]
+}

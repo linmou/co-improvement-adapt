@@ -1,4 +1,4 @@
-# Reflection Paradigm (Post-Persistence Human Improvement)
+# Reflection Paradigm (Anytime + Fallback Closeout)
 
 ## Purpose
 Reflection improves both sides of the loop:
@@ -7,17 +7,31 @@ Reflection improves both sides of the loop:
 
 This stage is not a score recap. It is a calibration step for the next loop.
 
+## Trigger modes
+1. **Anytime (primary):** run immediately when the human **explicitly** asks to reflect, labels text as reflection, or clearly answers reflection scaffold prompts mid-loop. Do not wait for section end or State 4 fallback.
+2. **Fallback closeout:** after `REVIEW_OK` and `PERSIST_OK`, show reflection already captured/happened in this loop, fill remaining scaffold gaps, and formally ask for `REFLECT_OK`.
+
+Non-triggers (treat as co-review or Learning Log material unless the human opts into reflection):
+- Ordinary evaluative comments during scoring ("AI was weak on X")
+- Preference or wording nits not framed as loop calibration
+- Score override reasons (those go to the learn interrupt if reusable)
+
+Both modes append to the session **Reflection Log**. Fallback must not re-interview from scratch when the log already satisfies the scaffold. Only State 4 fallback may collect `REFLECT_OK`.
+
 ## Inputs Required
-- State 2 artifacts: section scores, overrides, reasons.
-- State 3 artifacts: accepted memory items and skipped items.
+- Available State 2 artifacts: section scores, overrides, reasons (may be partial if reflecting early).
+- Learning Log / State 3 artifacts when present: accepted memory items and skipped items.
 - Cognitive budget estimate from `cognitive-budget-estimation.md`.
 
 ## Procedure
-1. Select scaffold depth from budget estimate (`low`, `medium`, `high`).
-2. Run the matching prompt set below.
-3. Allow short AI-human discussion for clarification only.
-4. Require final reflection answers to be human-authored.
-5. Convert validated outputs into concise next-loop commitments.
+1. If a budget was already estimated this loop, reuse it. Otherwise run `cognitive-budget-estimation.md` only when the human wants medium/high depth or when running fallback closeout.
+2. If anytime mode and budget is unknown, default scaffold to `low` unless the human asks for deeper reflection.
+3. Select scaffold depth (`low`, `medium`, `high`) from the budget estimate or the default above.
+4. Run the matching prompt set below (or only the unanswered prompts when resuming from the Reflection Log).
+5. Allow short AI-human discussion for clarification only.
+6. Require final reflection answers to be human-authored.
+7. Convert validated outputs into concise next-loop commitments.
+8. Write or update the Reflection Log row for this loop (timestamp, mode=`anytime|fallback`, answers, still-open prompts).
 
 ## Prompt Sets by Scaffold Depth
 
@@ -69,5 +83,6 @@ Constraint:
 6. `Open Question`
 
 ## Completion Condition
-- Reflection checkpoint token `REFLECT_OK` is present.
-- Answers satisfy scaffold constraints and anti-offloading guardrails.
+- For anytime interrupts: Reflection Log updated; prior state resumed; `REFLECT_OK` is optional until section closeout.
+- For fallback closeout: reflection checkpoint token `REFLECT_OK` is present.
+- Answers satisfy scaffold constraints and anti-offloading guardrails (or gaps are explicitly deferred with human consent before `REFLECT_OK`).

@@ -1,0 +1,122 @@
+{
+  "feature_name": "co_improvement_adapt_skill_calling",
+  "phase": "green",
+  "iteration": 1,
+  "reviewer_count": 3,
+  "status": "converged",
+  "disputed_criteria": [],
+  "criteria": {
+    "c1": {
+      "criterion_text": "Learn interrupt and State 3 explicitly spawn subagent($persist-rubrics-context) with Request builders and Response merge documented.",
+      "reviewer_count": 3,
+      "verdicts": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "confidences": [
+        0.96,
+        0.96,
+        0.93
+      ],
+      "final_verdict": "pass",
+      "converged": true
+    },
+    "c2": {
+      "criterion_text": "Response/Request schema SoT is callee call-contract.md; adapt does not redefine schema fields.",
+      "reviewer_count": 3,
+      "verdicts": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "confidences": [
+        0.92,
+        0.93,
+        0.9
+      ],
+      "final_verdict": "pass",
+      "converged": true
+    },
+    "c3": {
+      "criterion_text": "Coupling is one-way: adapt points to persist skill; adapt does not ship write-engine assets (no local memory-protocol/validator scripts).",
+      "reviewer_count": 3,
+      "verdicts": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "confidences": [
+        0.97,
+        0.97,
+        0.97
+      ],
+      "final_verdict": "pass",
+      "converged": true
+    },
+    "c4": {
+      "criterion_text": "skill_creator init_skill.py and quick_validate.py appear only as materialization helpers (State 1.5 / local-skill-output), not as co-review or persist writers.",
+      "reviewer_count": 3,
+      "verdicts": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "confidences": [
+        0.95,
+        0.95,
+        0.96
+      ],
+      "final_verdict": "pass",
+      "converged": true
+    },
+    "c5": {
+      "criterion_text": "State 3 is documented as audit gate only (PERSIST_OK, pending flush via subagent), not as implementer of JSON memory writes.",
+      "reviewer_count": 3,
+      "verdicts": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "confidences": [
+        0.96,
+        0.96,
+        0.95
+      ],
+      "final_verdict": "pass",
+      "converged": true
+    },
+    "c6": {
+      "criterion_text": "Reflection is invoked via references/reflection-paradigm.md (internal), not as $another-skill.",
+      "reviewer_count": 3,
+      "verdicts": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "confidences": [
+        0.94,
+        0.91,
+        0.88
+      ],
+      "final_verdict": "pass",
+      "converged": true
+    },
+    "c7": {
+      "criterion_text": "Helper scripts are resolved from installed skill directories (skill_creator / persist_rubrics_context), not assumed in the target repo.",
+      "reviewer_count": 3,
+      "verdicts": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "confidences": [
+        0.94,
+        0.95,
+        0.94
+      ],
+      "final_verdict": "pass",
+      "converged": true
+    }
+  }
+}

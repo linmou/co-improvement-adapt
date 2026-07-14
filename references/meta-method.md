@@ -48,7 +48,7 @@ Overarching Principles (unchanged):
        - Pattern A (high-AI-exposure): AI runs bulk sampling/analysis → outputs ranked list + evidence → human selects/refines via 1–2 prompts
        - Pattern B (low-AI-exposure): Human provides deeper context → AI generates options/counterfactuals → human judges salience/ethical fit
        - Feedback closure: "Incorporate this change → refine rubric X for next round"
-     - Embedded Lifecycle: include alignment, draft/work, co-review, persistence, and reflection gates inside the adapted workflow blueprint
+     - Embedded Lifecycle: include alignment, draft/work, co-review (open work), event-driven persistence on rubric/context feedback, anytime reflection, plus persistence and reflection fallback closeouts inside the adapted workflow blueprint
      - End/Transfer: Summary template + "Reuse refined rubric for similar task Y?"
 
 4. Design for Wrap & Longitudinal Transfer

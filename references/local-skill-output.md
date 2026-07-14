@@ -20,7 +20,7 @@ Resolve helper scripts from installed skill directories. In practice, do not ass
 
 - `<skill_creator_skill_dir>/scripts/init_skill.py`
 - `<skill_creator_skill_dir>/scripts/quick_validate.py`
-- `<co_improvement_adapt_skill_dir>/scripts/bootstrap_memory_artifacts.sh`
+- `<persist_rubrics_context_skill_dir>/scripts/bootstrap_memory_artifacts.sh` (memory helpers only; write engine is `$persist-rubrics-context`)
 
 For a new skill, use the `skill-creator` initialization flow when practical:
 
@@ -47,10 +47,10 @@ The generated skill must include:
    - alignment gate
    - draft/work gate
    - representative edit or work-sample gate when applicable
-   - co-review gate
-   - persistence gate
-   - reflection gate
-4. Explicit human checkpoint tokens or equivalent human-confirmation prompts.
+   - co-review gate (open work state with continuous learn/reflect interrupts)
+   - event-driven persistence on human rubric/context feedback (pre-write human `append|merge|skip`), plus persistence fallback closeout with Learning Log review and `PERSIST_OK`
+   - anytime reflection on explicit human request, plus reflection fallback closeout with Reflection Log review and `REFLECT_OK`
+4. Explicit human checkpoint tokens or equivalent human-confirmation prompts (`ALIGNMENT_OK`, work/review tokens, `PERSIST_OK`, `REFLECT_OK` as applicable).
 5. A "Human Improvement Space" section describing what the human can refine over time:
    - context
    - rubrics
@@ -58,7 +58,7 @@ The generated skill must include:
    - negative examples
    - scope boundaries
    - reflection depth
-6. A "Memory Interface" section explaining how the skill reads, writes, or references project `.co-improvement/learnt` context and rubric memory.
+6. A "Memory Interface" section explaining: (a) how the skill **reads** project `.co-improvement/learnt` contexts and rubrics, and (b) that **writes** go only through subagent(`$persist-rubrics-context`) — do not re-implement memory-protocol/validators in the generated skill unless the human explicitly wants bundled helpers.
 7. A "Validation" section naming deterministic checks, semantic checks, and manual review gates.
 
 Keep bulky schemas, sample records, rubrics, and templates in `references/` instead of bloating `SKILL.md`.
@@ -69,11 +69,14 @@ Every local skill produced by this adapter must leave visible slots for future h
 
 ```markdown
 ## Human Improvement Space
-- Add context when a human correction reveals a stable project fact.
-- Add or refine rubrics when a correction changes how future outputs should be judged.
+- Add context when a human correction reveals a stable project fact; learn interrupt → subagent(`$persist-rubrics-context`) immediately; human chooses append|merge|skip before write; do not wait for section end.
+- Add or refine rubrics when a correction changes how future outputs should be judged; same subagent(`$persist-rubrics-context`) path and Learning Log (`pending` until decided).
 - Record representative edits before document-wide or workflow-wide propagation.
-- Keep reflection effort adjustable; default to the project preference when known.
+- Reflect at any time on an explicit reflect request; still run a fallback reflection closeout that shows the Reflection Log and collects `REFLECT_OK`.
+- Keep reflection effort adjustable; default to the project preference when known (anytime default scaffold low if budget unknown).
 ```
+
+Generated skills must operationalize the learn interrupt as subagent(`$persist-rubrics-context`) (or an equivalent subagent procedure), including Learning Log fields and host fallback `PERSIST_OK`.
 
 Do not hide human improvement only in prose. Make it operational: future users must know where to add context, when to update rubrics, and when to stop propagation.
 
@@ -99,8 +102,9 @@ Before final handoff:
 <skill_creator_skill_dir>/scripts/quick_validate.py <skill-folder>
 ```
 
-2. If rubric memory changed, run the co-improvement rubric validator.
+2. If rubric memory changed, rely on `$persist-rubrics-context` subagent validator output (do not re-implement validation in the adapter).
 3. Check that the skill can be triggered from its frontmatter description.
 4. Check that the embedded co-improvement loop is explicit and not merely implied.
-5. Check that human checkpoint tokens or confirmation prompts exist before irreversible propagation, persistence, and reflection closure.
-6. Check that the final handoff names the local skill path and any unresolved risks.
+5. Check that human checkpoint tokens or confirmation prompts exist before irreversible propagation, persistence fallback closeout, and reflection fallback closeout.
+6. Check that event-driven persist and anytime reflection are specified, not only end-of-section gates.
+7. Check that the final handoff names the local skill path and any unresolved risks.
