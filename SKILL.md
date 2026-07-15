@@ -38,7 +38,7 @@ If the user explicitly wants only a draft workflow, persist the workflow under `
 10. The adapted workflow draft must explicitly contain its own co-improvement lifecycle with alignment, draft/work, co-review, event-driven persistence, anytime reflection, and fallback closeout gates.
 11. When Local Skill Output Mode applies, the final deliverable must be a valid local skill folder, not only a Markdown workflow draft.
 12. On human feedback that contains rubrics, contexts, reusable constraints, or generalizable score reasons, immediately spawn a **subagent** that runs `$persist-rubrics-context` using the client adapter in `references/persist-learnings-skill.md` and the callee contract `persist-rubrics-context/references/call-contract.md`; do not wait for section end.
-13. On an **explicit** human request to reflect, or human text labeled as reflection / clearly answering reflection scaffold prompts, run the reflection flow immediately; do not wait for State 4 fallback. Ordinary co-review critique is not a reflection trigger.
+13. On an **explicit** human request to reflect, or human text labeled as reflection / clearly answering reflection scaffold prompts, immediately spawn **subagent(`$reflect-user-memory`)** (see `references/reflect-client-adapter.md`); do not wait for State 4 fallback. Ordinary co-review critique is not a reflection trigger.
 
 ## Mandatory Lifecycle (State Machine)
 
@@ -46,7 +46,7 @@ If the user explicitly wants only a draft workflow, persist the workflow under `
 - Keep the section open in State 2 until `REVIEW_OK`.
 - During State 2 (and any non-terminal state), fire interrupts:
   - **Learn event** → subagent(`$persist-rubrics-context`) → resume prior state
-  - **Reflect event** → run reflection flow → resume prior state
+  - **Reflect event** → subagent(`$reflect-user-memory`) → resume prior state
 - Nested interrupts are allowed during State 3/4 fallback; they append Learning/Reflection Log rows and resume the interrupted closeout state. Only State 4 fallback may collect `REFLECT_OK`.
 - After `REVIEW_OK`, run **fallback closeouts** only:
   1. State 3 fallback — human reviews learnings already decided / still pending
@@ -105,7 +105,12 @@ These fire at any moment during State 2 (options discussion, scoring, overrides,
   3. Subagent follows callee `SKILL.md` + `call-contract.md` and returns a versioned **Response** JSON.
   4. Merge `learning_log_row` (if included) into the session Learning Log; record writes/validation for later audit.
   5. **Resume State 2** (no section advance).
-- **Reflect interrupt:** when the human **explicitly** asks to reflect, or sends text labeled as reflection / clearly answering scaffold prompts, run `references/reflection-paradigm.md`. If budget is unknown, default scaffold to `low` unless the human asks for deeper reflection; if a budget was already estimated this loop, reuse it. Append to the Reflection Log, then resume this state. Ordinary co-review comments are Learning Log or score-rationale material, not reflection.
+- **Reflect interrupt:** when the human **explicitly** asks to reflect, or sends text labeled as reflection / clearly answering scaffold prompts:
+  1. Build Request per `references/reflect-client-adapter.md` (`caller_tag: reflect-interrupt`, `persist: true`, `scaffold` from budget or `auto`).
+  2. Spawn **subagent(`$reflect-user-memory`)** (do not inline reflection prompts or user-memory writes).
+  3. Merge Response `reflection_log_row` into the session Reflection Log; note user-memory digest path if written.
+  4. Resume State 2 (no section advance; `REFLECT_OK` only at State 4).
+  Ordinary co-review comments are Learning Log or score-rationale material, not reflection.
 
 #### Co-review sequence
 1. Print section title and content.
@@ -136,14 +141,14 @@ Write engine remains subagent(`$persist-rubrics-context`). This state is the per
 - After `PERSIST_OK`, enter State 4 fallback.
 
 ### State 4 — Reflection Fallback Gate (Human Improvement)
-Primary path is anytime reflection. This state is the **fallback closeout**.
-- Show the session **Reflection Log**: reflection already captured/happened in this loop (if any).
-- Run cognitive budget estimation using `references/cognitive-budget-estimation.md` if not already done for this loop; if reflecting lightly / budget still unknown, default scaffold `low` per `references/reflection-paradigm.md`.
-- If reflection is incomplete for the selected scaffold depth, formally ask the remaining prompts from `references/reflection-paradigm.md`.
-- If reflection already satisfies the scaffold and anti-offloading guardrails, present the captured answers for confirmation instead of re-interviewing from scratch.
-- Require final reflection answers in human-authored form (or explicit human confirmation of captured text).
+Primary path is anytime **subagent(`$reflect-user-memory`)**. This state is the permanent **closeout audit** for reflection (host still owns `REFLECT_OK`).
+- Show the session **Reflection Log** (merged rows from prior reflect calls).
+- Run cognitive budget estimation using `references/cognitive-budget-estimation.md` if not already done for this loop.
+- If reflection is incomplete, spawn **subagent(`$reflect-user-memory`)** with `caller_tag: state4-fallback`, packing existing answers into `human_reflection` and `scaffold` from budget (or `auto` → low).
+- If already complete, present captured answers + user-memory digest status for confirmation (optional re-call with `persist=true` if digest was skipped).
 - Ask human reflection checkpoint token: `REFLECT_OK` (only this fallback may collect `REFLECT_OK`).
 - Return to State 2 for the next section after `REFLECT_OK`; complete workflow after all sections are done.
+- Durable L1 reflection digests live in `~/.codex/user-memory.md` (owned by `$reflect-user-memory`), not project `.co-improvement/learnt/`.
 
 ## Completion Criteria
 The final deliverable is the persisted adapted workflow or local skill, not a long transcript. When Local Skill Output Mode applies, the local skill folder is the primary deliverable and the `.co-improvement/drafts/` artifact is supporting evidence.
@@ -157,7 +162,7 @@ A run is complete only after a semantic check confirms that:
 6. When Response included `validation` after rubric writes, it is present in the handoff (host does not re-implement validation).
 7. If a local skill was produced, `<skill_creator_skill_dir>/scripts/quick_validate.py <skill-folder>` passed, or the final handoff states why validation could not run.
 8. Persistence used subagent(`$persist-rubrics-context`) via call-contract; State 3 audited session rows rather than writing memory inline.
-9. Reflection could run anytime; State 4 fallback showed reflection that already happened in the loop and formally closed gaps.
+9. Reflection used subagent(`$reflect-user-memory`) with digests in `~/.codex/user-memory.md` when persisted; State 4 closed with `REFLECT_OK`.
 
 The final chat response should be a compact handoff with the adapted workflow path, local skill path if created, memory paths created or changed, validation evidence, key human decisions, and unresolved risks.
 
@@ -170,6 +175,9 @@ The final chat response should be a compact handoff with the adapted workflow pa
 - `${CODEX_HOME:-$HOME/.codex}/skills/persist-rubrics-context/references/memory-protocol.md` (storage execution only)
 - `references/local-skill-output.md`
 - `references/cognitive-budget-estimation.md`
-- `references/reflection-paradigm.md`
+- `references/reflect-client-adapter.md` (thin client for `$reflect-user-memory`)
+- `references/reflection-paradigm.md` (pointer to reflect skill)
+- `${CODEX_HOME:-$HOME/.codex}/skills/reflect-user-memory/SKILL.md`
+- `${CODEX_HOME:-$HOME/.codex}/user-memory.md` (L1 digests)
 - `./.co-improvement/learnt/contexts/` (read path)
 - `./.co-improvement/learnt/rubrics/index.json` (read path)

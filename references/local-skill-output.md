@@ -49,7 +49,7 @@ The generated skill must include:
    - representative edit or work-sample gate when applicable
    - co-review gate (open work state with continuous learn/reflect interrupts)
    - event-driven persistence on human rubric/context feedback (pre-write human `append|merge|skip`), plus persistence fallback closeout with Learning Log review and `PERSIST_OK`
-   - anytime reflection on explicit human request, plus reflection fallback closeout with Reflection Log review and `REFLECT_OK`
+   - anytime reflection via subagent(`$reflect-user-memory`) into user-memory digests, plus reflection fallback closeout with Reflection Log review and `REFLECT_OK`
 4. Explicit human checkpoint tokens or equivalent human-confirmation prompts (`ALIGNMENT_OK`, work/review tokens, `PERSIST_OK`, `REFLECT_OK` as applicable).
 5. A "Human Improvement Space" section describing what the human can refine over time:
    - context
@@ -72,7 +72,7 @@ Every local skill produced by this adapter must leave visible slots for future h
 - Add context when a human correction reveals a stable project fact; learn interrupt → subagent(`$persist-rubrics-context`) immediately; human chooses append|merge|skip before write; do not wait for section end.
 - Add or refine rubrics when a correction changes how future outputs should be judged; same subagent(`$persist-rubrics-context`) path and Learning Log (`pending` until decided).
 - Record representative edits before document-wide or workflow-wide propagation.
-- Reflect at any time on an explicit reflect request; still run a fallback reflection closeout that shows the Reflection Log and collects `REFLECT_OK`.
+- Reflect at any time on an explicit reflect request via `$reflect-user-memory` (persists digests to `~/.codex/user-memory.md`); still run a fallback reflection closeout that shows the Reflection Log and collects `REFLECT_OK`.
 - Keep reflection effort adjustable; default to the project preference when known (anytime default scaffold low if budget unknown).
 ```
 

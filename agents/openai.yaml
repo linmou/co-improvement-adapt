@@ -1,4 +1,4 @@
 interface:
   display_name: "Co-Improvement Adapter"
   short_description: "Create reusable co-improvement workflows or skills"
-  default_prompt: "Use $co-improvement-adapt to turn this workflow into a reusable local skill with co-review, event-driven $persist-rubrics-context via subagent, State 3 audit, and reflection fallback closeouts."
+  default_prompt: "Use $co-improvement-adapt to turn this workflow into a reusable local skill with co-review, $persist-rubrics-context and $reflect-user-memory via subagent, State 3/4 audit closeouts."
